@@ -1,3 +1,8 @@
 # OctoPrintWifiDisplay
-this is a based esp8266 project that will display the status of 3d printer that is connected to Octoprint using mqtt plugin.
+OctoPrint Wifi Display is a Esp8266 based project that will display the status from Octoprint instance and display it on character LCD screen (20X4)
+
+Boards:
+ - ESP8266
+ - LCD screen (20X4)
+
 ![alt text](https://github.com/nori0aw/OctoPrintWifiDisplay/blob/master/STL%20Files/IMG_2021-06-16-11-33-37-512.jpg)
