@@ -23,6 +23,7 @@ void setup() {
   // put your setup code here, to run once:
   WiFi.mode(WIFI_STA);
   wifiManager.setTimeout(120);
+  wifiManager.setAPCallback(configModeCallback);
   // initialize LCD
   lcd.init();
   // turn on LCD backlight
@@ -32,22 +33,8 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("Connecting to Wifi");
   
-  if (!wifiManager.autoConnect("OctoWifiDisplay")) { // this function should return true if it was connected to wifi. otherwise will dispay error message and start wifi access point
-
-    Serial.println("unable to connect..");
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Not Connected to");
-    lcd.setCursor(0, 1);
-    lcd.print("Wifi");
-    lcd.setCursor(0, 2);
-    lcd.print("Connect to Access");
-    lcd.setCursor(0, 3);
-    lcd.print("Point");
-  }
-
-
-
+  wifiManager.autoConnect("OctoWifiDisplay");
+  
   Serial.println("connected...yeey :)");
 
   lcd.clear();
@@ -61,6 +48,19 @@ void setup() {
 
 
 
+}
+
+void configModeCallback (WiFiManager *myWiFiManager) {// this function should return true if it was connected to wifi. otherwise will dispay error message and start wifi access point
+    Serial.println("unable to connect..");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Not Connected to");
+    lcd.setCursor(0, 1);
+    lcd.print("Wifi");
+    lcd.setCursor(0, 2);
+    lcd.print("Connect to Access");
+    lcd.setCursor(0, 3);
+    lcd.print("Point");
 }
 
 
