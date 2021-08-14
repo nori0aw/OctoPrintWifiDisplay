@@ -64,17 +64,6 @@ void configModeCallback (WiFiManager *myWiFiManager) {// this function should re
 }
 
 
-void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-
-
-}
-
-
-
 int Connected_ts, Printing_ts, Disconnected_ts , PrintDone_ts , PrintCancelled_ts;
 int PrintingProgress;
 String PrintingProgress_str;
@@ -85,9 +74,43 @@ String PrinterStatusOffline;
 String PrintTimeLeft;
 String totalLayer , currentLayer;
 
-boolean PrintDone_bol = false;
+
 boolean PrintPowerState_bol;
 String PrintPowerState_str;
+long OffTime = millis();
+
+    
+
+void loop() {
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  if (PrinterStatus == "Printing Done" or  (PrinterStatusOffline == "Printing Finished" &&  PrinterStatus == "Disconnected" )    ){
+    LCDBlink();
+  }else{
+    lcd.backlight();
+  }
+
+
+}
+
+
+
+void LCDBlink(){
+//Serial.println("In Blink");
+  if (millis()-OffTime > 1000 && millis()-OffTime < 2000 ) {
+    
+    lcd.noBacklight();
+  }else if(millis()-OffTime > 2000){
+    
+    lcd.backlight();
+    OffTime = millis(); 
+  }
+  
+}
+
 
 void callback(char* topic, byte* payload, unsigned int length) {
 
@@ -107,7 +130,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     currentLayer = "-";
     totalLayer = "-";
     PrintingProgress_str = "0";
-    PrintDone_bol = false;
+   
   }
 
   if (topic_str == "octoPrint/progress/printing")
@@ -119,24 +142,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if (topic_str == "octoPrint/event/Connected")
   {
     Connected_ts = doc["_timestamp"];
-    PrintDone_bol = false;
+
   }
   if (topic_str == "octoPrint/event/Disconnected")
   {
     Disconnected_ts = doc["_timestamp"];
-    PrintDone_bol = false;
+   
   }
   if (topic_str == "octoPrint/event/PrintDone")
   {
     PrintDone_ts = doc["_timestamp"];
-    PrintDone_bol = true;
+   
 
 
   }
   if (topic_str == "octoPrint/event/PrintCancelled")
   {
     PrintCancelled_ts = doc["_timestamp"];
-    PrintDone_bol = false;
+ 
   }
   if (topic_str == "octoPrint/temperature/tool0")
   {
@@ -192,7 +215,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   if ( PrintCancelled_ts > Printing_ts and PrintCancelled_ts > Disconnected_ts and PrintCancelled_ts > PrintDone_ts and PrintCancelled_ts > Connected_ts ) {
     PrinterStatus = "Printing Cancelled";
-    
+
 
   }
   if ( PrintCancelled_ts > PrintDone_ts) { // for offline status......./////////////////////////////////////////////////////
@@ -201,6 +224,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   }else{
     PrinterStatusOffline = "Printing Finished";
+
   }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   writeToDisplay();
